@@ -5,8 +5,8 @@ import Peer from "simple-peer";
 // Create a context for sharing state across components
 const SocketContext = createContext();
 
-const socket = io("https://video-chat-app-9xej.onrender.com");
-// const socket = io("http://localhost:5000"); //testing
+// const socket = io("https://video-chat-app-9xej.onrender.com")/=;
+const socket = io("http://localhost:5000"); //testing
 
 const ContextProvider = ({ children }) => {
   // State to hold the local stream, call data, and other relevant information

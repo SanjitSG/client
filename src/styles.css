@@ -9,3 +9,11 @@ body {
   background-attachment: fixed;
   background-size: cover;
 }
+
+/* src/style.css */
+
+.mobile-video-frame {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}

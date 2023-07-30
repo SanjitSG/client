@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Grid, Typography, Paper, styled, useTheme, IconButton } from "@mui/material";
 import { Videocam, VideocamOff, Mic, MicOff } from "@mui/icons-material";
 
@@ -19,7 +19,7 @@ const PaperStyled = styled(Paper)(({ theme }) => ({
 
 const useStyles = (theme) => ({
   video: {
-    width: "550px",
+    width: "100%",
     [theme.breakpoints.down("xs")]: {
       width: "300px",
     },
@@ -42,11 +42,19 @@ const VideoPlayer = () => {
   const { name, callAccepted, myVideo, userVideo, callEnded, stream, call } = useContext(SocketContext);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
-  const [userVideoEnabled, setUserVideoEnabled] = useState(true); // Add this state for remote user video
-  const [userAudioEnabled, setUserAudioEnabled] = useState(true); // Add this state for remote user audio
 
   const theme = useTheme();
   const classes = useStyles(theme);
+
+  useEffect(() => {
+    // To fix the video frame on mobile devices
+    if (myVideo.current && window.innerWidth <= 600) {
+      myVideo.current.classList.add("mobile-video-frame");
+    }
+    if (userVideo.current && window.innerWidth <= 600) {
+      userVideo.current.classList.add("mobile-video-frame");
+    }
+  }, []);
 
   const handleVideoToggle = () => {
     setVideoEnabled((prev) => !prev);
@@ -56,18 +64,6 @@ const VideoPlayer = () => {
   const handleAudioToggle = () => {
     setAudioEnabled((prev) => !prev);
     myVideo.current.srcObject.getAudioTracks()[0].enabled = !audioEnabled;
-  };
-
-  const handleUserVideoToggle = () => {
-    // Add logic to control the remote user's video here
-    setUserVideoEnabled((prev) => !prev);
-    userVideo.current.srcObject.getVideoTracks()[0].enabled = !userVideoEnabled;
-  };
-
-  const handleUserAudioToggle = () => {
-    // Add logic to control the remote user's audio here
-    setUserAudioEnabled((prev) => !prev);
-    userVideo.current.srcObject.getAudioTracks()[0].enabled = !userAudioEnabled;
   };
 
   return (
@@ -83,11 +79,9 @@ const VideoPlayer = () => {
               <video playInline muted ref={myVideo} autoPlay className={classes.video}></video>
               <div className={classes.controlIcons}>
                 <IconButton aria-label="toggle video" color="inherit" onClick={handleVideoToggle}>
-                  {/* Video toggle for local user */}
                   {videoEnabled ? <Videocam /> : <VideocamOff />}
                 </IconButton>
                 <IconButton aria-label="toggle audio" color="inherit" onClick={handleAudioToggle}>
-                  {/* Audio toggle for local user */}
                   {audioEnabled ? <Mic /> : <MicOff />}
                 </IconButton>
               </div>
@@ -102,16 +96,6 @@ const VideoPlayer = () => {
                 {call.name || "Name"}
               </Typography>
               <video playInline ref={userVideo} autoPlay className={classes.video}></video>
-              <div className={classes.controlIcons}>
-                <IconButton aria-label="toggle video" color="inherit" onClick={handleUserVideoToggle}>
-                  {/* Video toggle for remote user */}
-                  {userVideoEnabled ? <Videocam /> : <VideocamOff />}
-                </IconButton>
-                <IconButton aria-label="toggle audio" color="inherit" onClick={handleUserAudioToggle}>
-                  {/* Audio toggle for remote user */}
-                  {userAudioEnabled ? <Mic /> : <MicOff />}
-                </IconButton>
-              </div>
             </Grid>
           </PaperStyled>
         )}
